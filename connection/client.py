@@ -35,7 +35,7 @@ class Client:
         if match := re.match(r'^(RSA|Rabin|ElGamal|DH) (\d+) (\d+) (\d+)$', data):
             self.server_keys = (int(match.group(2)), int(match.group(3)), int(match.group(4)))
             if match.group(1) == "DH":
-                self.encryptor.finishedKeyExchange(self.server_keys[2], p=self.server_keys[0])
+                self.encryptor.finishKeyExchange(self.server_keys[2], p=self.server_keys[0])
                 self.server_keys = self.encryptor.publicKey
             self.send(f"Hello, server!")
         else:

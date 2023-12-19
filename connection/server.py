@@ -1,8 +1,8 @@
 import asyncio
 import socket
-import time
 import encryption
 import re
+import random
 
 class Server:
 
@@ -60,16 +60,19 @@ class Server:
         if match := re.match(r'^(RSA|Rabin|ElGamal|DH) (\d+) (\d+) (\d+)$', data):
             self.client_keys[client] = (int(match.group(2)), int(match.group(3)), int(match.group(4)))
             if match.group(1) == "DH":
-                self.client_encryptors[client] = encryption.DiffieHellmanEncryptor()
-                self.client_encryptors[client].finishKeyExchange(self.client_keys[client][2], p=self.client_keys[client][0])
+                self.client_encryptors[client] = encryption.DiffieHellmanEncryptor((self.client_keys[client][0], random.randint(1, 0x7fffffff)))
+                self.send(client, f"{self.client_encryptors[client]}", encrypt=False)
+                self.client_encryptors[client].finishKeyExchange(self.client_keys[client][2])
                 self.client_keys[client] = self.client_encryptors[client].publicKey
             elif match.group(1) == "RSA":
                 self.client_encryptors[client] = self.rsa
+                self.send(client, f"{self.client_encryptors[client]}", encrypt=False)
             elif match.group(1) == "Rabin":
                 self.client_encryptors[client] = self.rabin
+                self.send(client, f"{self.client_encryptors[client]}", encrypt=False)
             elif match.group(1) == "ElGamal":
                 self.client_encryptors[client] = self.elgamal
-            self.send(client, f"{self.client_encryptors[client]}", encrypt=False)
+                self.send(client, f"{self.client_encryptors[client]}", encrypt=False)
         else:
             decrypted: str = self.client_encryptors[client].decrypt([int(i) for i in data.rstrip().split(" ")])
             print(f'Server: decrypted {repr(decrypted)} from \'{client}\'')
