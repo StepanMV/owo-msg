@@ -52,6 +52,9 @@ class Server:
                 self.client_sockets.pop(address_str, 0)
                 self.client_keys.pop(address_str, 0)
                 self.client_encryptors.pop(address_str, 0)
+                if self.client_connections.get(address_str, None):
+                    self.send(self.client_connections[address_str], f"Connection lost with {self.client_nicknames[address_str]}")
+                    self.client_connections.pop(self.client_connections[address_str], 0)
                 self.client_connections.pop(address_str, 0)
                 self.client_nicknames.pop(address_str, 0)
                 break
@@ -79,6 +82,7 @@ class Server:
             if decrypted == "LIST":
                 
                 self.send(client, f"LIST {' '.join([f'{item[0]}({item[1]})' for item in self.client_nicknames.items()])}")
+
             elif match := re.match(r'^(CONNECT) (\d+.\d+.\d+.\d+:\d+)$', decrypted):
                 if match.group(2) not in self.client_sockets:
                     self.send(client, f"ERROR: {match.group(2)} is not connected to the server")
@@ -90,6 +94,7 @@ class Server:
                 self.client_connections[match.group(2)] = client
                 self.send(client, f"Connected to {match.group(2)}")
                 self.send(match.group(2), f"{client} ({self.client_nicknames[client]}) connected to you")
+
             elif match := re.match(r'^(CONNECT) (.+)$', decrypted): # connect by nickname
                 for key, value in self.client_nicknames.items():
                     if value == match.group(2):
@@ -104,26 +109,23 @@ class Server:
                 else:
                     self.send(client, f"ERROR: {match.group(2)} is not connected to the server")
                     return
-            elif match := re.match(r'^(DISCONNECT) (\d+.\d+.\d+.\d+:\d+)$', decrypted):
-                self.send(client, f"Disconnected from {match.group(2)}")
-                self.send(match.group(2), f"{client} ({self.client_nicknames[client]}) disconnected from you")
+                
+            elif decrypted == "DISCONNECT":
+                other = self.client_connections[client]
+                self.send(client, f"Disconnected from {other}")
+                self.send(other, f"{client} ({self.client_nicknames[client]}) disconnected from you")
                 self.client_connections.pop(client, 0)
-                self.client_connections.pop(match.group(2), 0)
-            elif match := re.match(r'^(DISCONNECT) (.+)$', decrypted): # disconnect by nickname
-                for key, value in self.client_nicknames.items():
-                    if value == match.group(2):
-                        self.send(client, f"Disconnected from {match.group(2)}")
-                        self.send(key, f"{client} ({self.client_nicknames[client]}) disconnected from you")
-                        self.client_connections.pop(client, 0)
-                        self.client_connections.pop(key, 0)
-                        break
+                self.client_connections.pop(other, 0)
+
             elif decrypted == "ME":
                 self.send(client, f"YOUR IP: {client}")
                 self.send(client, f"YOUR NICKNAME: {self.client_nicknames[client]}")
+
             elif match := re.match(r'^(NICK) (.+)$', decrypted):
                 self.client_nicknames[client] = match.group(2)
                 if client in self.client_connections:
                     self.send(self.client_connections[client], f"{client} ({self.client_nicknames[client]}) changed nickname to {match.group(2)}")
+
             else:
                 if client in self.client_connections:
                     self.send(self.client_connections[client], f"{self.client_nicknames[client]}: {decrypted}")
@@ -150,5 +152,8 @@ class Server:
             self.client_sockets.pop(key, 0)
             self.client_keys.pop(key, 0)
             self.client_encryptors.pop(key, 0)
+            if self.client_connections.get(key, None):
+                self.client_connections.pop(self.client_connections[key], 0)
+                self.send(self.client_connections[key], f"Connection lost with {self.client_nicknames[key]}")
             self.client_connections.pop(key, 0)
             self.client_nicknames.pop(key, 0)
