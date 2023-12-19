@@ -5,24 +5,24 @@ class ElGamalEncryptor(Encryptor):
     def __str__(self) -> str:
         return f"ElGamal {self.publicKey[0]} {self.publicKey[1]} {self.publicKey[2]}"
 
-    def __init__(self, publicKeyData=[]):
+    def __init__(self, keyData=[]):
         super().__init__()
-        if not publicKeyData: # если не переданы данные о ключе (генерация ключа)
+        if not keyData: # если не переданы данные о ключе (генерация ключа)
             self.publicKey.append(self.getRandomPrime())  # p
             self.publicKey.append(self.primitiveRoot(self.publicKey[0]))  # g
             self.privateKey.append(random.randint(1, self.publicKey[0] - 1))  # x
             self.publicKey.append(self.reminderPower(self.publicKey[1], self.privateKey[0], self.publicKey[0]))  # y
         else: # если переданы данные о ключе
-            if len(publicKeyData) != 2:
+            if len(keyData) != 2:
                 raise ValueError("ElGamal requires a prime number and a number smaller than it")
-            if not self.isPrime(publicKeyData[0]):
+            if not self.isPrime(keyData[0]):
                 raise ValueError("ElGamal: p is not a prime")
-            if publicKeyData[1] >= publicKeyData[0]:
+            if keyData[1] >= keyData[0]:
                 raise ValueError("ElGamal: x is not smaller than p")
-            self.publicKey.append(publicKeyData[0])  # p
-            self.publicKey.append(self.primitiveRoot(publicKeyData[0]))  # g
-            self.publicKey.append(self.reminderPower(self.publicKey[1], publicKeyData[1], self.publicKey[0]))  # y
-            self.privateKey.append(publicKeyData[1])  # x
+            self.publicKey.append(keyData[0])  # p
+            self.publicKey.append(self.primitiveRoot(keyData[0]))  # g
+            self.publicKey.append(self.reminderPower(self.publicKey[1], keyData[1], self.publicKey[0]))  # y
+            self.privateKey.append(keyData[1])  # x
 
     # шифрование происходит по формуле: a = g^k mod p, b = m * y^k mod p
     def encrypt(self, input, publicKey=None):

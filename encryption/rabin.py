@@ -61,18 +61,3 @@ class RabinEncryptor(Encryptor):
             elif n - s < 128:
                 decrypted += chr(n - s)
         return decrypted
-
-    # китайская теорема об остатках
-    def chineseMod(self, k, b, m):
-        a = 1
-        t = []
-        while k > 0:
-            t.append(k % 2)
-            k = (k - t[-1]) // 2
-        for j in range(len(t)):
-            if t[j] == 1:
-                a = (a * b) % m
-                b = (b * b) % m
-            else:
-                b = (b * b) % m
-        return a
