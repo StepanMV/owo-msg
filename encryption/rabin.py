@@ -16,7 +16,7 @@ class RabinEncryptor(Encryptor):
         self.privateKey.append(q)
         self.publicKey.append(self.privateKey[0] * self.privateKey[1])
 
-    def __init__(self, publicKeyData):
+    def __init__(self, publicKeyData=[]):
         super().__init__()
         if len(publicKeyData) != 2:
             raise ValueError("Invalid Rabin public key data")
