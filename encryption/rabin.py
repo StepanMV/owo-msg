@@ -4,31 +4,30 @@ class RabinEncryptor(Encryptor):
     def __str__(self) -> str:
         return f"Rabin {self.publicKey[0]} {0} {0}"
 
-    def __init__(self):
+    def __init__(self, publicKeyData=None):
         super().__init__()
-        p = self.getRandomPrime()
-        q = self.getRandomPrime()
-        while p % 4 != 3:
+        if publicKeyData is None:
             p = self.getRandomPrime()
-        while p == q or q % 4 != 3:
             q = self.getRandomPrime()
-        self.privateKey.append(p)
-        self.privateKey.append(q)
-        self.publicKey.append(self.privateKey[0] * self.privateKey[1])
-
-    def __init__(self, publicKeyData=[]):
-        super().__init__()
-        if len(publicKeyData) != 2:
-            raise ValueError("Invalid Rabin public key data")
-        if publicKeyData[0] == publicKeyData[1]:
-            raise ValueError("Rabin received two equal prime numbers")
-        if not self.isPrime(publicKeyData[0]) or not self.isPrime(publicKeyData[1]):
-            raise ValueError("Rabin received non-prime number(s)")
-        if publicKeyData[0] % 4 != 3 or publicKeyData[1] % 4 != 3:
-            raise ValueError("Rabin received non-prime numbers that are not congruent to 3 modulo 4")
-        self.publicKey.append(publicKeyData[0] * publicKeyData[1])
-        self.privateKey.append(publicKeyData[0])
-        self.privateKey.append(publicKeyData[1])
+            while p % 4 != 3:
+                p = self.getRandomPrime()
+            while p == q or q % 4 != 3:
+                q = self.getRandomPrime()
+            self.privateKey.append(p)
+            self.privateKey.append(q)
+            self.publicKey.append(self.privateKey[0] * self.privateKey[1])
+        else:
+            if len(publicKeyData) != 2:
+                raise ValueError("Invalid Rabin public key data")
+            if publicKeyData[0] == publicKeyData[1]:
+                raise ValueError("Rabin received two equal prime numbers")
+            if not self.isPrime(publicKeyData[0]) or not self.isPrime(publicKeyData[1]):
+                raise ValueError("Rabin received non-prime number(s)")
+            if publicKeyData[0] % 4 != 3 or publicKeyData[1] % 4 != 3:
+                raise ValueError("Rabin received non-prime numbers that are not congruent to 3 modulo 4")
+            self.publicKey.append(publicKeyData[0] * publicKeyData[1])
+            self.privateKey.append(publicKeyData[0])
+            self.privateKey.append(publicKeyData[1])
 
     def encrypt(self, input, publicKey=[]):
         if len(publicKey) == 0:
