@@ -19,9 +19,9 @@ class RSAEncryptor(Encryptor):
             while publicKeyData[0] == publicKeyData[1]:
                 publicKeyData[1] = self.getRandomPrime()
 
-        self.publicKey.append(publicKeyData[0] * publicKeyData[1])
+        self.publicKey.append(publicKeyData[0] * publicKeyData[1]) # n
         phi = (publicKeyData[0] - 1) * (publicKeyData[1] - 1)
-        self.publicKey.append(self.getCoprime(phi))
+        self.publicKey.append(self.getCoprime(phi)) # e
 
         self.privateKey.append(self.euclidInverse(self.publicKey[1], phi))
 

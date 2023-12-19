@@ -13,17 +13,27 @@ class Encryptor:
         return random.randint(min, max)
 
     def getRandomPrime(self):
-        return 3  # Replace with actual prime number generation logic
-    
+        return 3  # Replace with actual prime number generation logic 
+
+    # def reminderPower(self, base, power, mod):
+    #     if power > mod:
+    #         power %= mod - 1
+    #     res = 1
+    #     for i in range(power):
+    #         res *= base
+    #         res %= mod
+    #     return res
 
     def reminderPower(self, base, power, mod):
-        if power > mod:
-            power %= mod - 1
-        res = 1
-        for i in range(power):
-            res *= base
-            res %= mod
-        return res
+        base %= mod
+        if power > mod: power %= mod - 1
+        result = 1
+        while power > 0:
+            if power % 2 == 1:
+                result = (result * base) % mod
+            base = (base * base) % mod
+            power //= 2
+        return result
 
     def euclidInverse(self, a, m):
         m0 = m
