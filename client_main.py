@@ -11,11 +11,11 @@ if len(sys.argv) < 6:
 if sys.argv[3] == "RSA":
     encryptor = encryption.RSAEncryptor((int(sys.argv[4]), int(sys.argv[5])))
 elif sys.argv[3] == "Rabin":
-    encryptor = encryption.RabinEncryptor(int(sys.argv[4]), int(sys.argv[5]))
+    encryptor = encryption.RabinEncryptor((int(sys.argv[4]), int(sys.argv[5])))
 elif sys.argv[3] == "ElGamal":
-    encryptor = encryption.ElGamalEncryptor(int(sys.argv[4]), int(sys.argv[5]))
+    encryptor = encryption.ElGamalEncryptor((int(sys.argv[4]), int(sys.argv[5])))
 elif sys.argv[3] == "DifHel":
-    encryptor = encryption.DiffieHellmanEncryptor(int(sys.argv[4]), int(sys.argv[5]))
+    encryptor = encryption.DiffieHellmanEncryptor((int(sys.argv[4]), int(sys.argv[5])))
 else:
     print("Usage: python3 client_main.py <server ip> <server port> <encryptor> <arg1> <arg2>")
     exit()
