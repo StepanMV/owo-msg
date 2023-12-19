@@ -107,15 +107,15 @@ class Server:
             elif match := re.match(r'^(DISCONNECT) (\d+.\d+.\d+.\d+:\d+)$', decrypted):
                 self.send(client, f"Disconnected from {match.group(2)}")
                 self.send(match.group(2), f"{client} ({self.client_nicknames[client]}) disconnected from you")
-                self.client_connections.pop(client)
-                self.client_connections.pop(match.group(2))
+                self.client_connections.pop(client, 0)
+                self.client_connections.pop(match.group(2), 0)
             elif match := re.match(r'^(DISCONNECT) (.+)$', decrypted): # disconnect by nickname
                 for key, value in self.client_nicknames.items():
                     if value == match.group(2):
                         self.send(client, f"Disconnected from {match.group(2)}")
                         self.send(key, f"{client} ({self.client_nicknames[client]}) disconnected from you")
-                        self.client_connections.pop(client)
-                        self.client_connections.pop(key)
+                        self.client_connections.pop(client, 0)
+                        self.client_connections.pop(key, 0)
                         break
             elif decrypted == "ME":
                 self.send(client, f"YOUR IP: {client}")
