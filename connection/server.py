@@ -125,6 +125,9 @@ class Server:
                 if client in self.client_connections:
                     self.send(self.client_connections[client], f"{client} ({self.client_nicknames[client]}) changed nickname to {match.group(2)}")
 
+            elif decrypted == "EXIT":
+                pass
+            
             else:
                 if client in self.client_connections:
                     self.send(self.client_connections[client], f"{self.client_nicknames[client]}: {decrypted}")
