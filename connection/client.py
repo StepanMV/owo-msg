@@ -7,7 +7,7 @@ import re
 
 class Client:
 
-    def __init__(self, server_ip, server_port=25565, encryptor=encryption.RSAEncryptor((631, 113))):
+    def __init__(self, server_ip, server_port=25565, encryptor=encryption.RSAEncryptor()):
         self.server_ip = server_ip
         self.server_port = server_port
         self.main_loop = None

@@ -6,7 +6,7 @@ class RSAEncryptor(Encryptor):
 
     def __init__(self, publicKeyData = []):
         super().__init__()
-        if not publicKeyData:
+        if publicKeyData:
             if len(publicKeyData) != 2:
                 raise ValueError("Invalid RSA public key data")
             if publicKeyData[0] == publicKeyData[1]:
