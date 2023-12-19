@@ -16,15 +16,6 @@ class Encryptor:
     def getRandomPrime(self):
         return self.primes[random.randint(0, len(self.primes) - 1)]
 
-    # def reminderPower(self, base, power, mod):
-    #     if power > mod:
-    #         power %= mod - 1
-    #     res = 1
-    #     for i in range(power):
-    #         res *= base
-    #         res %= mod
-    #     return res
-
     def reminderPower(self, base, power, mod):
         base %= mod
         if power > mod: power %= mod - 1
@@ -78,8 +69,10 @@ class Encryptor:
                 return False
         return True
 
+    # можно передать чужой открытый ключ, чтобы шифровать по нему (по умлочанию шифрование по своему открытому ключу)
     def encrypt(self, input, publicKey=None):
         raise NotImplementedError("Encryptor.encrypt() not implemented")
     
+    # расшифровка (по своему ключу)
     def decrypt(self, encrypted):
         raise NotImplementedError("Encryptor.decrypt() not implemented")

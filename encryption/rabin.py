@@ -6,17 +6,19 @@ class RabinEncryptor(Encryptor):
 
     def __init__(self, publicKeyData=[]):
         super().__init__()
-        if not publicKeyData:
+        if not publicKeyData: # если не переданы данные о ключе (генерация ключа)
             p = self.getRandomPrime()
             q = self.getRandomPrime()
             while p % 4 != 3:
                 p = self.getRandomPrime()
             while p == q or q % 4 != 3:
                 q = self.getRandomPrime()
+            # приватный ключ - два простых числа p и q
             self.privateKey.append(p)
             self.privateKey.append(q)
+            # открытый ключ - их произведение
             self.publicKey.append(self.privateKey[0] * self.privateKey[1])
-        else:
+        else: # если переданы данные о ключе
             if len(publicKeyData) != 2:
                 raise ValueError("Invalid Rabin public key data")
             if publicKeyData[0] == publicKeyData[1]:
@@ -25,13 +27,14 @@ class RabinEncryptor(Encryptor):
                 raise ValueError("Rabin received non-prime number(s)")
             if publicKeyData[0] % 4 != 3 or publicKeyData[1] % 4 != 3:
                 raise ValueError("Rabin received non-prime numbers that are not congruent to 3 modulo 4")
-            self.publicKey.append(publicKeyData[0] * publicKeyData[1])
-            self.privateKey.append(publicKeyData[0])
-            self.privateKey.append(publicKeyData[1])
+            self.publicKey.append(publicKeyData[0] * publicKeyData[1]) # p * q
+            self.privateKey.append(publicKeyData[0]) # p
+            self.privateKey.append(publicKeyData[1]) # q
 
     def encrypt(self, input, publicKey=[]):
         if len(publicKey) == 0:
             publicKey = self.publicKey
+        # шифрование происходит по формуле: c = m^2 mod n
         return [self.reminderPower(ord(ch), 2, publicKey[0]) for ch in input]
 
     def decrypt(self, encrypted):
@@ -39,6 +42,8 @@ class RabinEncryptor(Encryptor):
         q = self.privateKey[1]
         n = self.publicKey[0]
         decrypted = ""
+        # используя китайскую теорему об остатках и расширенный алгоритм Евклида, расшифровываем каждый символ
+        # приходится выбирать из 4 вариантов
         for c in encrypted:
             mp = self.chineseMod((p + 1) // 4, c, p)
             mq = self.chineseMod((q + 1) // 4, c, q)
@@ -57,6 +62,7 @@ class RabinEncryptor(Encryptor):
                 decrypted += chr(n - s)
         return decrypted
 
+    # китайская теорема об остатках
     def chineseMod(self, k, b, m):
         a = 1
         t = []

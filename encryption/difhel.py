@@ -2,18 +2,23 @@ from .basic_encryptor import Encryptor
 import random
 
 class DiffieHellmanEncryptor(Encryptor):
+    # мини фокус: при незавершенном обмене ключами, вместо открытого ключа y, возвращаем reminder
+    # клиент (new DifHel = p, g, clientReminder) -> сервер 
+    # сервер (new DifHel = p, g, serverReminder) -> клиент, сервер.finishKeyExchange(clientReminder)
+    # клиент.finishKeyExchange(serverReminder)
+    # итог: клиент.publicKey = сервер.publicKey = p, g, y
     def __str__(self) -> str:
         return f"DH {self.publicKey[0]} {self.publicKey[1]} {self.reminder if not self.finishedKeyExchange else self.publicKey[2]}"
 
     def __init__(self, publicKeyData=[]):
         super().__init__()
         self.finishedKeyExchange = False
-        if not publicKeyData:
+        if not publicKeyData: # если не переданы данные о ключе (генерация ключа)
             self.publicKey.append(self.getRandomPrime())  # p
             self.publicKey.append(self.primitiveRoot(self.publicKey[0]))  # g
             self.privateKey.append(random.randint(1, 0x7fffffff))  # a (private)
             self.reminder = self.reminderPower(self.publicKey[1], self.privateKey[0], self.publicKey[0]) # reminder
-        else:
+        else: # если переданы данные о ключе
             if len(publicKeyData) != 2:
                 raise ValueError("DifHel requires a prime number and a number smaller than it")
             if not self.isPrime(publicKeyData[0]):
@@ -24,16 +29,18 @@ class DiffieHellmanEncryptor(Encryptor):
             self.privateKey.append(publicKeyData[1])  # a (private)
             self.reminder = self.reminderPower(self.publicKey[1], self.privateKey[0], self.publicKey[0]) # reminder
 
+    # развершение обмена ключами
     def finishKeyExchange(self, reminder, p=None):
         if self.finishedKeyExchange:
             raise ValueError("DifHel: Key exchange already finished")
-        if p:
+        if p: # если передано p (открытый ключ другого пользователя), то синхронизируемся с ним
             self.publicKey[0] = p
-            self.publicKey[1] = self.primitiveRoot(self.publicKey[0])
+            self.publicKey[1] = self.primitiveRoot(self.publicKey[0]) # g
         self.privateKey[0] = self.reminderPower(reminder, self.privateKey[0], self.publicKey[0])  # x (final private)
         self.publicKey.append(self.reminderPower(self.publicKey[1], self.privateKey[0], self.publicKey[0]))  # y (final public)
         self.finishedKeyExchange = True
 
+    # алгоритм Эль-Гамаля
     def encrypt(self, input, publicKey=None):
         if not self.finishedKeyExchange:
             raise ValueError("DifHel: Key exchange not finished")
@@ -45,6 +52,7 @@ class DiffieHellmanEncryptor(Encryptor):
             res.append((self.reminderPower(publicKey[2], k, publicKey[0]) * ord(input[i])) % publicKey[0])
         return res
 
+    # алгоритм Эль-Гамаля
     def decrypt(self, encrypted):
         if not self.finishedKeyExchange:
             raise ValueError("DifHel: Key exchange not finished")
@@ -54,6 +62,7 @@ class DiffieHellmanEncryptor(Encryptor):
             res += chr((encrypted[i] * self.reminderPower(a, self.publicKey[0] - 1 - self.privateKey[0], self.publicKey[0])) % self.publicKey[0])
         return res
 
+    # поиск первообразного корня по модулю p
     def primitiveRoot(self, p):
         fact = []
         phi = p - 1
