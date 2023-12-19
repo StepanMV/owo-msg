@@ -1,6 +1,9 @@
 from .basic_encryptor import Encryptor
 
 class RabinEncryptor(Encryptor):
+    def __str__(self) -> str:
+        return f"Rabin {self.publicKey[0]} {0} {0}"
+
     def __init__(self):
         super().__init__()
         p = self.getRandomPrime()

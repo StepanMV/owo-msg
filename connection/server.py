@@ -49,14 +49,11 @@ class Server:
 
             except ConnectionResetError:  # если клиент отключился, покидается цикл и задача уничтожается
                 print(f'Server: client {repr(address_str)} has disconnected!')
-                try:
-                    self.client_sockets.pop(address_str)
-                    self.client_keys.pop(address_str)
-                    self.client_encryptors.pop(address_str)
-                    self.client_connections.pop(address_str)
-                    self.client_nicknames.pop(address_str)
-                except KeyError:
-                    pass
+                self.client_sockets.pop(address_str, 0)
+                self.client_keys.pop(address_str, 0)
+                self.client_encryptors.pop(address_str, 0)
+                self.client_connections.pop(address_str, 0)
+                self.client_nicknames.pop(address_str, 0)
                 break
     
     async def _process_data(self, client, data: str):
@@ -75,7 +72,7 @@ class Server:
             self.send(client, f"{self.client_encryptors[client]}", encrypt=False)
         else:
             decrypted: str = self.client_encryptors[client].decrypt([int(i) for i in data.rstrip().split(" ")])
-            print(f'Server: decrypted \'{repr(decrypted)}\' from \'{client}\'')
+            print(f'Server: decrypted {repr(decrypted)} from \'{client}\'')
             if decrypted == "LIST":
                 
                 self.send(client, f"LIST {' '.join([f'{item[0]}({item[1]})' for item in self.client_nicknames.items()])}")
@@ -144,14 +141,11 @@ class Server:
             data = ' '.join([str(i) for i in encrypted]) + "\n"
         try:
             self.client_sockets[key].sendall(data.encode())
-            print(f'Server: sent \'{repr(data)}\' to \'{address_str}\'')
+            print(f'Server: sent {repr(data)} to \'{address_str}\'')
         except BrokenPipeError:  # если подключение было разорвано (сервер выключен)
             print(f'Error sending {repr(data)}, connection with \'{address_str}\' lost')
-            try:
-                self.client_sockets.pop(key)
-                self.client_keys.pop(key)
-                self.client_encryptors.pop(key)
-                self.client_connections.pop(key)
-                self.client_nicknames.pop(key)
-            except KeyError:
-                pass
+            self.client_sockets.pop(key, 0)
+            self.client_keys.pop(key, 0)
+            self.client_encryptors.pop(key, 0)
+            self.client_connections.pop(key, 0)
+            self.client_nicknames.pop(key, 0)
