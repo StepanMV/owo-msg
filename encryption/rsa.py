@@ -4,9 +4,9 @@ class RSAEncryptor(Encryptor):
     def __str__(self) -> str:
         return f"RSA {self.publicKey[0]} {self.publicKey[1]} {0}"
 
-    def __init__(self, publicKeyData = None):
+    def __init__(self, publicKeyData = []):
         super().__init__()
-        if publicKeyData is not None:
+        if not publicKeyData:
             if len(publicKeyData) != 2:
                 raise ValueError("Invalid RSA public key data")
             if publicKeyData[0] == publicKeyData[1]:

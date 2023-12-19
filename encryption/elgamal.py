@@ -5,9 +5,9 @@ class ElGamalEncryptor(Encryptor):
     def __str__(self) -> str:
         return f"ElGamal {self.publicKey[0]} {self.publicKey[1]} {self.publicKey[2]}"
 
-    def __init__(self, publicKeyData=None):
+    def __init__(self, publicKeyData=[]):
         super().__init__()
-        if publicKeyData is None:
+        if not publicKeyData:
             self.publicKey.append(self.getRandomPrime())  # p
             self.publicKey.append(self.primitiveRoot(self.publicKey[0]))  # g
             self.privateKey.append(random.randint(1, self.publicKey[0] - 1))  # x

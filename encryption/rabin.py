@@ -4,9 +4,9 @@ class RabinEncryptor(Encryptor):
     def __str__(self) -> str:
         return f"Rabin {self.publicKey[0]} {0} {0}"
 
-    def __init__(self, publicKeyData=None):
+    def __init__(self, publicKeyData=[]):
         super().__init__()
-        if publicKeyData is None:
+        if not publicKeyData:
             p = self.getRandomPrime()
             q = self.getRandomPrime()
             while p % 4 != 3:
