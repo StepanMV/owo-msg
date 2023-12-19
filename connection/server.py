@@ -22,9 +22,9 @@ class Server:
         self.client_connections = {}
         self.client_nicknames = {}
 
-        self.rsa = encryption.RSAEncryptor((271, 293))
-        self.rabin = encryption.RabinEncryptor((271, 631))
-        self.elgamal = encryption.ElGamalEncryptor((293, 271))
+        self.rsa = encryption.RSAEncryptor()
+        self.rabin = encryption.RabinEncryptor()
+        self.elgamal = encryption.ElGamalEncryptor()
 
     async def _accept_connection(self):  # корутина для принятия подключений
         while self.running:

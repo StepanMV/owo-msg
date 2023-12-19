@@ -8,7 +8,9 @@ class RabinEncryptor(Encryptor):
         super().__init__()
         p = self.getRandomPrime()
         q = self.getRandomPrime()
-        while p == q:
+        while p % 4 != 3:
+            p = self.getRandomPrime()
+        while p == q or q % 4 != 3:
             q = self.getRandomPrime()
         self.privateKey.append(p)
         self.privateKey.append(q)
