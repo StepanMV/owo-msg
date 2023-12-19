@@ -52,10 +52,9 @@ class Server:
                 self.client_sockets.pop(address_str, 0)
                 self.client_keys.pop(address_str, 0)
                 self.client_encryptors.pop(address_str, 0)
-                if self.client_connections.get(address_str, None):
-                    self.send(self.client_connections[address_str], f"Connection lost with {self.client_nicknames[address_str]}")
-                    self.client_connections.pop(self.client_connections[address_str], 0)
-                self.client_connections.pop(address_str, 0)
+                if other := self.client_connections.pop(address_str, None):
+                    self.client_connections.pop(other, 0)
+                    self.send(other, f"Connection lost with {self.client_nicknames[address_str]}")
                 self.client_nicknames.pop(address_str, 0)
                 break
     
@@ -152,8 +151,7 @@ class Server:
             self.client_sockets.pop(key, 0)
             self.client_keys.pop(key, 0)
             self.client_encryptors.pop(key, 0)
-            if self.client_connections.get(key, None):
-                self.client_connections.pop(self.client_connections[key], 0)
-                self.send(self.client_connections[key], f"Connection lost with {self.client_nicknames[key]}")
-            self.client_connections.pop(key, 0)
+            if other := self.client_connections.pop(key, None):
+                self.client_connections.pop(other, 0)
+                self.send(other, f"Connection lost with {self.client_nicknames[key]}")
             self.client_nicknames.pop(key, 0)
