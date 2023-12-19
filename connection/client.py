@@ -37,7 +37,6 @@ class Client:
             if match.group(1) == "DH":
                 self.encryptor.finishKeyExchange(self.server_keys[2], p=self.server_keys[0])
                 self.server_keys = self.encryptor.publicKey
-            self.send(f"Hello, server!")
         else:
             decrypted: str = self.encryptor.decrypt([int(i) for i in data.rstrip().split(" ")])
             if decrypted.startswith("LIST"):

@@ -4,23 +4,23 @@ class RSAEncryptor(Encryptor):
     def __str__(self) -> str:
         return f"RSA {self.publicKey[0]} {self.publicKey[1]} {0}"
 
-    def __init__(self, publicKeyData = []):
+    def __init__(self, keyData = []):
         super().__init__()
-        if publicKeyData: # если переданы данные о ключе
-            if len(publicKeyData) != 2:
+        if keyData: # если переданы данные о ключе
+            if len(keyData) != 2:
                 raise ValueError("RSA requires two prime numbers")
-            if publicKeyData[0] == publicKeyData[1]:
+            if keyData[0] == keyData[1]:
                 raise ValueError("RSA received two equal prime numbers")
-            if not self.isPrime(publicKeyData[0]) or not self.isPrime(publicKeyData[1]):
+            if not self.isPrime(keyData[0]) or not self.isPrime(keyData[1]):
                 raise ValueError("RSA received non-prime number(s)")
         else: # если не переданы данные о ключе (генерация ключа)
-            publicKeyData.append(self.getRandomPrime())
-            publicKeyData.append(self.getRandomPrime())
-            while publicKeyData[0] == publicKeyData[1]:
-                publicKeyData[1] = self.getRandomPrime()
+            keyData.append(self.getRandomPrime())
+            keyData.append(self.getRandomPrime())
+            while keyData[0] == keyData[1]:
+                keyData[1] = self.getRandomPrime()
 
-        self.publicKey.append(publicKeyData[0] * publicKeyData[1]) # n (произведение двух простых чисел)
-        phi = (publicKeyData[0] - 1) * (publicKeyData[1] - 1) # функция Эйлера
+        self.publicKey.append(keyData[0] * keyData[1]) # n (произведение двух простых чисел)
+        phi = (keyData[0] - 1) * (keyData[1] - 1) # функция Эйлера
         self.publicKey.append(self.getCoprime(phi)) # e (взаимно простое с phi)
 
         self.privateKey.append(self.euclidInverse(self.publicKey[1], phi)) # d - приватный ключ (обратное к e по модулю phi)
